@@ -1,0 +1,80 @@
+---
+title: "Introduccion"
+author: "Abel Isaias Gutierrez-Cruz"
+date: "3/8/2021"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+## Directorios 
+```{r }
+setwd("..") # establcer un directorio en especifico 
+getwd() # obtener directorio actual 
+```
+
+Instalar nuevos paquetes: `install.packages("ggplot2")`
+
+## Tipos de datos 
+
+`class()`: sirve para determinar el tipo de dato de una variable
+```{r}
+caracter <- "a"
+numero <- 1
+entero <- 1L
+complejo <- 2 + 1i
+logico <- TRUE
+print(logico)
+```
+**Parsear**: intermbiar entre tipo de datos 
+```{r}
+class(as.character(numero))
+class(as.numeric("2"))
+```
+## Operadores aritmeticos 
+```{r}
+print(4**2)
+print(5 + 5)
+print(10 - 1)
+print(5 %% 2)
+```
+
+## Operadores relacionales 
+```{r}
+variable <- 5
+print(5 > 1)
+print(variable < 10)
+print(6 <= 1)
+print("hello" == "adios")
+```
+## Operadores logicos 
+```{r}
+(0 > 1) | (5 < 1)
+(8 > 1) & (0 < 1)
+!(FALSE)
+```  
+## Operadores condicionales 
+```{r}
+variable1 <- 1
+if (variable1 > 5){
+    print("Soy mayor que 5")
+} else {
+    print("No soy mayor que 5")
+}
+```
+```{r}
+variable <- 12
+if (variable == 5){
+    print("soy igual a 5")
+} else if (variable == 6){
+    print(("Soy igual a 6"))
+} else{
+    print("Ningua de las opciones anteriores")
+}
+```
+

@@ -1,0 +1,19 @@
+---
+title: "Introduccion"
+author: "Abel Isaias Gutierrez-Cruz"
+date: "3/8/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+## Directorios 
+```{r include=FALSE}
+setwd("..") # establcer un directorio en especifico 
+getwd() # obtener directorio actual 
+```
+
+Instalar nuevos paquetes: `install.packages("ggplot2")`

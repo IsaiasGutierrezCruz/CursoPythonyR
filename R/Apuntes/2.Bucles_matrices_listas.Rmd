@@ -1,0 +1,156 @@
+---
+title: "Bucles, vectores, matrices y listas"
+author: "Abel Isaias Gutierrez-Cruz"
+date: "4/8/2021"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Estructuras repetitivas 
+### For 
+```{r}
+for (i in 1:10){
+    print(i)
+}
+```
+Uso de la palabra `next`
+```{r}
+for (i in 1:10){
+    if (i == 3){
+        next
+    }
+    print(i)
+}
+```
+
+Uso de la palabra `break`
+```{r}
+for (i in 1:10){
+    if (i == 3){
+        break 
+    }
+    print(i)
+}
+```
+
+### While 
+```{r}
+i <- 0
+while (i <= 10){
+    print(i)
+    i = i + 1
+}
+```
+
+### Repeat 
+```{r}
+i <- 0
+repeat{
+    if (i == 10){
+        break
+    }
+    print(i)
+    i = i + 1
+}
+```
+## Vectores
+### Formas de definir vectores
+```{r}
+vector <- c("1", "2", "3")
+print(vector)
+```
+```{r}
+vector <- vector("numeric", length = 10)
+print(vector)
+```
+Evaluar si es un vector o no
+```{r}
+is.vector(vector)
+```
+```{r}
+x <- rep("nombre", 20)
+print(x)
+```
+```{r}
+x <- seq(1, 10, by=2)
+print(x)
+# acceder a un rango elementos de un vector 
+x[1:3]
+# acceder a un elemento de un vector
+x[2]
+```
+Juntar dos vectores 
+```{r}
+c(vector, x)
+```
+```{r}
+x*2
+```
+
+## Matrices 
+Creacion de matrices 
+```{r}
+matriz <- matrix(nrow = 2, ncol = 3)
+print(matriz)
+```
+```{r}
+matriz1 <- matrix(1:6, nrow = 2, ncol = 3)
+print(matriz1)
+```
+Ingresar a una fila 
+```{r}
+matriz1[1, ]
+```
+Ingrear a una columna
+```{r}
+matriz1[, 1]
+```
+Relación entre vectores y matrices 
+```{r}
+x <- 1:20
+print(dim(x))
+matriz1 <- matrix(1:6, nrow = 2, ncol = 3)
+print(dim(matriz1))
+```
+Convertir un vector a matriz 
+```{r}
+m <- 1:10
+dim(m) <- c(2, 5)
+print(m)
+```
+Unir dos vectores para la cración de una matriz 
+```{r}
+x <- 1:3
+y <- 10:12
+# une columna 
+matriz2 <- cbind(x, y)
+matriz2
+colnames(matriz2)
+```
+```{r}
+matriz3 <-rbind(x, y)
+matriz3
+```
+## Listas 
+```{r}
+x <- list("elemento1"=1, "elemento2"=c(1, 2, 3, 4, 5), 
+          "elemento3"=matrix(1:10, nrow = 2, ncol = 5), "elemento4"="soy un elemento")
+x
+```
+```{r}
+print(x$elemento1)
+print(x$elemento2)
+print(x$elemento4)
+x["elemento1"]
+```
+```{r}
+x[1]
+x[[3]]
+```
+
+ 

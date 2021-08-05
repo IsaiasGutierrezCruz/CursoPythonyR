@@ -1,0 +1,22 @@
+---
+title: "Estructuras secuenciales"
+author: "Abel Isaias Gutierrez-Cruz"
+date: "4/8/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Ejercicio 1
+```{r}
+print("Ingrese su nombre:")
+nombre <- readline()
+asteriscos <- "*******************"
+asteriscos_nom <- "******"
+print(asteriscos)
+nombrea <- c(asteriscos_nom, nombre, asteriscos_nom)
+print(nombrea)
+```
+

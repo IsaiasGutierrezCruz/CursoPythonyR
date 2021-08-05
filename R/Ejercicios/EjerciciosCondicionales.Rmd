@@ -1,0 +1,24 @@
+---
+title: "EjerciciosCondicionales"
+author: "Abel Isaias Gutierrez-Cruz"
+date: "4/8/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Ejercicio 1
+Elaborar un programa que pida al usuario ingresar un número y devolver como respuesta si este número es par o impar.
+```{r}
+print("Ingresar un número:")
+num1 <- readline()
+num1 <- as.numeric(num1[1])
+if (num1 %% 2 == 0){
+    print("Este numero es par")
+} else{
+    print("Este numero no es par")
+}
+```
+

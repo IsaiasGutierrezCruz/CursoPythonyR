@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Elaboración de Gráficos con el sistema base de R y con ggplot2</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Abel Isaias Gutierrez-Cruz" />
+    <script src="5.GraficosConGgplot2_files/header-attrs-2.9/header-attrs.js"></script>
+    <link href="5.GraficosConGgplot2_files/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <link href="5.GraficosConGgplot2_files/remark-css-0.0.1/chocolate-fonts.css" rel="stylesheet" />
+    <link href="5.GraficosConGgplot2_files/remark-css-0.0.1/tamu.css" rel="stylesheet" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Elaboración de Gráficos con el sistema base de R y con ggplot2
+### Abel Isaias Gutierrez-Cruz
+### 10/8/2021
+
+---
+
+
+
+
+# Preparación del ambiente
+Cargar la librería de ggplot2 para la elaboración de los gráficos
+
+```r
+library(ggplot2)
+```
+
+
+## Para que usar gráficas en el analisis de datos
+- Para entender las propiedades de los datos
+- Para encontrar patrones en los datos
+- Para sugerir estrategias de modelado 
+- Para comunicar los resultados 
+
+`install.packages(c("pagedown", "xaringan"), dependencies = TRUE)`
+
+---
+
+
+### Cargar los datos y explorarlos
+
+airquality contiene datos sobre la calidad de aire
+
+```r
+data(airquality) 
+```
+
+
+```r
+head(airquality, 3)
+```
+
+```
+##   Ozone Solar.R Wind Temp Month Day
+## 1    41     190  7.4   67     5   1
+## 2    36     118  8.0   72     5   2
+## 3    12     149 12.6   74     5   3
+```
+
+---
+
+
+```r
+summary(airquality)
+```
+
+```
+##      Ozone           Solar.R           Wind             Temp           Month            Day      
+##  Min.   :  1.00   Min.   :  7.0   Min.   : 1.700   Min.   :56.00   Min.   :5.000   Min.   : 1.0  
+##  1st Qu.: 18.00   1st Qu.:115.8   1st Qu.: 7.400   1st Qu.:72.00   1st Qu.:6.000   1st Qu.: 8.0  
+##  Median : 31.50   Median :205.0   Median : 9.700   Median :79.00   Median :7.000   Median :16.0  
+##  Mean   : 42.13   Mean   :185.9   Mean   : 9.958   Mean   :77.88   Mean   :6.993   Mean   :15.8  
+##  3rd Qu.: 63.25   3rd Qu.:258.8   3rd Qu.:11.500   3rd Qu.:85.00   3rd Qu.:8.000   3rd Qu.:23.0  
+##  Max.   :168.00   Max.   :334.0   Max.   :20.700   Max.   :97.00   Max.   :9.000   Max.   :31.0  
+##  NA's   :37       NA's   :7
+```
+
+Características de las variables de airquality
+
+```r
+str(airquality)
+```
+
+```
+## 'data.frame':	153 obs. of  6 variables:
+##  $ Ozone  : int  41 36 12 18 NA 28 23 19 8 NA ...
+##  $ Solar.R: int  190 118 149 313 NA NA 299 99 19 194 ...
+##  $ Wind   : num  7.4 8 12.6 11.5 14.3 14.9 8.6 13.8 20.1 8.6 ...
+##  $ Temp   : int  67 72 74 62 56 66 65 59 61 69 ...
+##  $ Month  : int  5 5 5 5 5 5 5 5 5 5 ...
+##  $ Day    : int  1 2 3 4 5 6 7 8 9 10 ...
+```
+
+
+
+---
+
+## Plots con el sistema base de R
+
+Se comienza con un gráfico base, este gráfico posteriormente será modificado con más propiedades
+
+### Parametros útiles 
+- `pch`: simbolo utilizado en el gráfico 
+- `lty`: el tipo de línea utilizada
+- `lwd`: el ancho de la línea, especificado como un entero 
+- `col`: determinar el color del plot, es especificado como un número, string o código hexadecimal
+- `xlab`: El texto que se desea que aparezca en el eje de las x 
+- `ylab`: El texto que se desea que aparezca en el eje de las y 
+
+---
+
+### Funciones utiles 
+- `lines`: agrega lineas a un gráfico, dado dos vectores de valores
+- `points`: agrega puntos a un gráfico 
+- `text`: agrega etiquetas de texto a un gráfico, especificando su posición con coordenadas "x" y "y" 
+- `title`: agregar anotaciones a las etiquetas del eje x, y, titulo, subtitulo o fuera del margen
+- `axis`: agrega etiquetas a los ejes
+- `legend`: recibe la ubicación de la legenda como primer parámetro (topleft, topright, bottomleft, bottomright) y el parámetro `legend = "texto"`
+
+---
+
+#### Box plot
+
+```r
+boxplot(Ozone ~ Month, airquality, xlab = "Mes", ylab = "Ozono")
+title(main = "Niveles de ozono según el mes del año")
+```
+
+&lt;img src="5.GraficosConGgplot2_files/figure-html/unnamed-chunk-18-1.png" width="400px" /&gt;
+
+---
+
+Scatter plot
+
+```r
+with(airquality, plot(Wind, Ozone, main = "Ozono con respecto al polvo", col = "red"))
+with(subset(airquality, Month == 5), points(Wind, Ozone, col = "blue"))
+legend("topright", pch = 1, col = c("blue", "red"), legend = c("May", "Other Months"))
+```
+
+&lt;img src="5.GraficosConGgplot2_files/figure-html/unnamed-chunk-19-1.png" width="400px" /&gt;
+
+
+---
+
+#### Gráfico base con regresión lineal 
+
+```r
+with(airquality, plot(Wind, Ozone, main = "Ozone y Polvo en Nueva York", pch=20))
+model &lt;- lm(Ozone ~ Wind, airquality)
+abline(model, lwd=2)
+```
+
+&lt;img src="5.GraficosConGgplot2_files/figure-html/unnamed-chunk-20-1.png" width="400px" /&gt;
+
+
+---
+#### Gráficos múltiples 
+
+```r
+par(mfrow = c(1, 2))
+with(airquality, {
+    plot(Wind, Ozone, main = "Ozono y Polvo")
+    plot(Solar.R, Ozone, main = "Ozono y Radiación solar")
+})
+```
+
+&lt;img src="5.GraficosConGgplot2_files/figure-html/unnamed-chunk-21-1.png" width="400px" /&gt;
+
+---
+
+### Cargar los datos y explorarlos
+
+
+```r
+data("iris")
+```
+
+
+```r
+head(iris)
+```
+
+```
+##   Sepal.Length Sepal.Width Petal.Length Petal.Width Species
+## 1          5.1         3.5          1.4         0.2  setosa
+## 2          4.9         3.0          1.4         0.2  setosa
+## 3          4.7         3.2          1.3         0.2  setosa
+## 4          4.6         3.1          1.5         0.2  setosa
+## 5          5.0         3.6          1.4         0.2  setosa
+## 6          5.4         3.9          1.7         0.4  setosa
+```
+
+---
+
+
+```r
+summary(iris)
+```
+
+```
+##   Sepal.Length    Sepal.Width     Petal.Length    Petal.Width          Species  
+##  Min.   :4.300   Min.   :2.000   Min.   :1.000   Min.   :0.100   setosa    :50  
+##  1st Qu.:5.100   1st Qu.:2.800   1st Qu.:1.600   1st Qu.:0.300   versicolor:50  
+##  Median :5.800   Median :3.000   Median :4.350   Median :1.300   virginica :50  
+##  Mean   :5.843   Mean   :3.057   Mean   :3.758   Mean   :1.199                  
+##  3rd Qu.:6.400   3rd Qu.:3.300   3rd Qu.:5.100   3rd Qu.:1.800                  
+##  Max.   :7.900   Max.   :4.400   Max.   :6.900   Max.   :2.500
+```
+
+Características de las variables de iris 
+
+```r
+str(iris)
+```
+
+```
+## 'data.frame':	150 obs. of  5 variables:
+##  $ Sepal.Length: num  5.1 4.9 4.7 4.6 5 5.4 4.6 5 4.4 4.9 ...
+##  $ Sepal.Width : num  3.5 3 3.2 3.1 3.6 3.9 3.4 3.4 2.9 3.1 ...
+##  $ Petal.Length: num  1.4 1.4 1.3 1.5 1.4 1.7 1.4 1.5 1.4 1.5 ...
+##  $ Petal.Width : num  0.2 0.2 0.2 0.2 0.2 0.4 0.3 0.2 0.2 0.1 ...
+##  $ Species     : Factor w/ 3 levels "setosa","versicolor",..: 1 1 1 1 1 1 1 1 1 1 ...
+```
+
+---
+
+## Sistema ggplot2
+
+### Componentes basicos de un gráfico en ggplto2
+- A **data frame** 
+    - Se específica con `data = &lt;dataset&gt;`
+- **aesthetic mappings**: como los datos son representados en el sentido del color y  el tamaño 
+    - Se especifica con `mapping = aes(x = &lt;variable&gt;)`
+- **geoms**: objetos geometricos como puntos, lineas y figuras
+    - Se específica con el método correspondiente al gráfico 
+- **facets**: transformaciones estadisticas como cuantiles 
+- **scales**: que escala usar (example: hombre = rojo, mujer = azul)
+- **sistema de coordenadas**
+
+---
+
+#### Una variable continua
+
+```r
+ggplot(data = iris, mapping = aes(x = Sepal.Width)) + geom_histogram()
+```
+
+![](5.GraficosConGgplot2_files/figure-html/unnamed-chunk-26-1.png)&lt;!-- --&gt;
+---
+
+
+```r
+ggplot(data = iris, mapping = aes(x = Sepal.Width)) + geom_density()
+```
+
+![](5.GraficosConGgplot2_files/figure-html/unnamed-chunk-27-1.png)&lt;!-- --&gt;
+
+---
+
+
+```r
+ggplot(data = iris, mapping = aes(x = Sepal.Width)) + geom_dotplot()
+```
+
+![](5.GraficosConGgplot2_files/figure-html/unnamed-chunk-28-1.png)&lt;!-- --&gt;
+
+---
+
+
+```r
+ggplot(data = iris, mapping = aes(x = Sepal.Width)) + geom_freqpoly()
+```
+
+![](5.GraficosConGgplot2_files/figure-html/unnamed-chunk-29-1.png)&lt;!-- --&gt;
+
+---
+
+
+```r
+ggplot(data = iris, mapping = aes(x = Sepal.Width)) + geom_area(stat = "count")
+```
+
+![](5.GraficosConGgplot2_files/figure-html/unnamed-chunk-30-1.png)&lt;!-- --&gt;
+
+---
+
+#### Una variable categórica 
+
+```r
+data2 &lt;- iris[iris$Sepal.Length &gt; 5.5, ]
+ggplot(data = data2, mapping = aes(x=Species)) + geom_bar()
+```
+
+&lt;img src="5.GraficosConGgplot2_files/figure-html/unnamed-chunk-31-1.png" width="400px" /&gt;
+
+---
+
+Hacer un gráfico de barras con dos variables 
+
+```r
+ggplot(data = data2, mapping = aes(x = Species, y = Petal.Width)) + 
+    geom_col(position = "stack")
+```
+
+&lt;img src="5.GraficosConGgplot2_files/figure-html/unnamed-chunk-32-1.png" width="400px" /&gt;
+
+---
+
+#### Dos varaibles continuas 
+Scatterplot
+
+```r
+ggplot(data = data2, mapping = aes(x = Petal.Length, y = Petal.Width)) + geom_point()
+```
+
+&lt;img src="5.GraficosConGgplot2_files/figure-html/unnamed-chunk-33-1.png" width="400px" /&gt;
+
+---
+Agrega variación aleatoria a la posición de los puntos
+
+```r
+ggplot(data = data2, mapping = aes(x = Petal.Length, y = Petal.Width)) + geom_jitter()
+```
+
+![](5.GraficosConGgplot2_files/figure-html/unnamed-chunk-34-1.png)&lt;!-- --&gt;
+
+---
+Gráfico de los cuantiles
+
+```r
+ggplot(data = data2, mapping = aes(x = Petal.Length, y = Petal.Width)) + 
+    geom_quantile(quantiles = c(0.2, 0.4, 0.6, 0.8))
+```
+
+&lt;img src="5.GraficosConGgplot2_files/figure-html/unnamed-chunk-35-1.png" width="400px" /&gt;
+
+---
+Mostrar lineas de regresión de los datos para ayudar a la identificación de patrones
+
+```r
+ggplot(data = data2, mapping = aes(x = Petal.Length, y = Petal.Width)) + geom_smooth()
+```
+
+![](5.GraficosConGgplot2_files/figure-html/unnamed-chunk-36-1.png)&lt;!-- --&gt;
+
+---
+
+En el caso de querer una regresión lineal 
+
+```r
+ggplot(data = data2, mapping = aes(x = Petal.Length, y = Petal.Width)) + 
+    geom_smooth(method = "lm")
+```
+
+![](5.GraficosConGgplot2_files/figure-html/unnamed-chunk-37-1.png)&lt;!-- --&gt;
+
+---
+
+Graficar las distribuciones de ambas variables
+
+```r
+ggplot(data = data2, mapping = aes(x = Petal.Length, y = Petal.Width)) + geom_rug()
+```
+
+![](5.GraficosConGgplot2_files/figure-html/unnamed-chunk-38-1.png)&lt;!-- --&gt;
+
+---
+Combinar capas
+
+```r
+ggplot(data = iris, mapping = aes(x=Petal.Length, y=Petal.Width)) + geom_rug() +
+  geom_point() + geom_smooth(method="lm")
+```
+
+![](5.GraficosConGgplot2_files/figure-html/unnamed-chunk-39-1.png)&lt;!-- --&gt;
+
+---
+
+#### Agregar texto al gráfico
+Usando geom text
+
+```r
+data = data.frame("NumeroAlumnos" =c(2, 3, 4, 6), 
+                  "Calificacion" = runif(4, min = 0, max = 10))
+ggplot(data = data, mapping = aes(x=NumeroAlumnos, y=Calificacion)) + 
+    geom_col() + geom_text(label = c("1", "2", "3", "4"), nudge_y = 0.5)
+```
+
+&lt;img src="5.GraficosConGgplot2_files/figure-html/unnamed-chunk-40-1.png" width="400px" /&gt;
+
+---
+
+Usando annotate
+
+```r
+ggplot(data = iris, mapping = aes(x=Species, y=Petal.Width)) + geom_boxplot() +
+  annotate(geom="text", x=c(1,2,3), y=c(3,3,3),label=c(0.2,1.3,2))
+```
+
+![](5.GraficosConGgplot2_files/figure-html/unnamed-chunk-41-1.png)&lt;!-- --&gt;
+
+
+---
+
+### Cargar los datos y explorarlos
+
+
+```r
+data("mpg")
+```
+
+
+```r
+head(mpg)
+```
+
+```
+## # A tibble: 6 x 11
+##   manufacturer model displ  year   cyl trans      drv     cty   hwy fl    class  
+##   &lt;chr&gt;        &lt;chr&gt; &lt;dbl&gt; &lt;int&gt; &lt;int&gt; &lt;chr&gt;      &lt;chr&gt; &lt;int&gt; &lt;int&gt; &lt;chr&gt; &lt;chr&gt;  
+## 1 audi         a4      1.8  1999     4 auto(l5)   f        18    29 p     compact
+## 2 audi         a4      1.8  1999     4 manual(m5) f        21    29 p     compact
+## 3 audi         a4      2    2008     4 manual(m6) f        20    31 p     compact
+## 4 audi         a4      2    2008     4 auto(av)   f        21    30 p     compact
+## 5 audi         a4      2.8  1999     6 auto(l5)   f        16    26 p     compact
+## 6 audi         a4      2.8  1999     6 manual(m5) f        18    26 p     compact
+```
+
+---
+
+
+```r
+summary(mpg)
+```
+
+```
+##  manufacturer          model               displ            year           cyl           trans               drv           
+##  Length:234         Length:234         Min.   :1.600   Min.   :1999   Min.   :4.000   Length:234         Length:234        
+##  Class :character   Class :character   1st Qu.:2.400   1st Qu.:1999   1st Qu.:4.000   Class :character   Class :character  
+##  Mode  :character   Mode  :character   Median :3.300   Median :2004   Median :6.000   Mode  :character   Mode  :character  
+##                                        Mean   :3.472   Mean   :2004   Mean   :5.889                                        
+##                                        3rd Qu.:4.600   3rd Qu.:2008   3rd Qu.:8.000                                        
+##                                        Max.   :7.000   Max.   :2008   Max.   :8.000                                        
+##       cty             hwy             fl               class          
+##  Min.   : 9.00   Min.   :12.00   Length:234         Length:234        
+##  1st Qu.:14.00   1st Qu.:18.00   Class :character   Class :character  
+##  Median :17.00   Median :24.00   Mode  :character   Mode  :character  
+##  Mean   :16.86   Mean   :23.44                                        
+##  3rd Qu.:19.00   3rd Qu.:27.00                                        
+##  Max.   :35.00   Max.   :44.00
+```
+
+---
+
+Características de las variables
+
+```r
+str(mpg)
+```
+
+```
+## tibble [234 x 11] (S3: tbl_df/tbl/data.frame)
+##  $ manufacturer: chr [1:234] "audi" "audi" "audi" "audi" ...
+##  $ model       : chr [1:234] "a4" "a4" "a4" "a4" ...
+##  $ displ       : num [1:234] 1.8 1.8 2 2 2.8 2.8 3.1 1.8 1.8 2 ...
+##  $ year        : int [1:234] 1999 1999 2008 2008 1999 1999 2008 1999 1999 2008 ...
+##  $ cyl         : int [1:234] 4 4 4 4 6 6 6 4 4 4 ...
+##  $ trans       : chr [1:234] "auto(l5)" "manual(m5)" "manual(m6)" "auto(av)" ...
+##  $ drv         : chr [1:234] "f" "f" "f" "f" ...
+##  $ cty         : int [1:234] 18 21 20 21 16 18 18 18 16 20 ...
+##  $ hwy         : int [1:234] 29 29 31 30 26 26 27 26 25 28 ...
+##  $ fl          : chr [1:234] "p" "p" "p" "p" ...
+##  $ class       : chr [1:234] "compact" "compact" "compact" "compact" ...
+```
+
+---
+
+Faceting
+
+
+```r
+ggplot(mpg, aes(x=displ, y=hwy)) + geom_point()
+```
+
+![](5.GraficosConGgplot2_files/figure-html/unnamed-chunk-46-1.png)&lt;!-- --&gt;
+
+---
+
+Mostrar la relación según el año de fabricación en horizontal 
+
+
+```r
+ggplot(mpg, aes(displ, hwy)) + geom_point() + facet_grid(rows = vars(year))
+```
+
+![](5.GraficosConGgplot2_files/figure-html/unnamed-chunk-47-1.png)&lt;!-- --&gt;
+
+---
+
+Mostrar la relación según el año de fabricación
+
+
+```r
+ggplot(mpg, aes(displ, hwy)) + geom_point() + facet_grid(cols = vars(year))
+```
+
+![](5.GraficosConGgplot2_files/figure-html/unnamed-chunk-48-1.png)&lt;!-- --&gt;
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlighLine": true,
+"countIncrementalSlides": true
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

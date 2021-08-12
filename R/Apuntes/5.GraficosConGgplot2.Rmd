@@ -1,0 +1,324 @@
+---
+title: "Elaboración de Gráficos con el sistema base de R y con ggplot2"
+author: "Abel Isaias Gutierrez-Cruz"
+date: "10/8/2021"
+output:
+    xaringan::moon_reader:
+        css: ["default", "chocolate-fonts", "tamu"]
+        nature:
+            highlightStyle: github
+            highlighLine: true
+            countIncrementalSlides: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Preparación del ambiente
+Cargar la librería de ggplot2 para la elaboración de los gráficos
+```{r warning=FALSE}
+library(ggplot2)
+```
+
+
+## Para que usar gráficas en el analisis de datos
+- Para entender las propiedades de los datos
+- Para encontrar patrones en los datos
+- Para sugerir estrategias de modelado 
+- Para comunicar los resultados 
+
+`install.packages(c("pagedown", "xaringan"), dependencies = TRUE)`
+
+---
+
+
+### Cargar los datos y explorarlos
+
+airquality contiene datos sobre la calidad de aire
+```{r}
+data(airquality) 
+```
+
+```{r}
+head(airquality, 3)
+```
+
+---
+
+```{r}
+summary(airquality)
+```
+
+Características de las variables de airquality
+```{r}
+str(airquality)
+```
+
+
+
+---
+
+## Plots con el sistema base de R
+
+Se comienza con un gráfico base, este gráfico posteriormente será modificado con más propiedades
+
+### Parametros útiles 
+- `pch`: simbolo utilizado en el gráfico 
+- `lty`: el tipo de línea utilizada
+- `lwd`: el ancho de la línea, especificado como un entero 
+- `col`: determinar el color del plot, es especificado como un número, string o código hexadecimal
+- `xlab`: El texto que se desea que aparezca en el eje de las x 
+- `ylab`: El texto que se desea que aparezca en el eje de las y 
+
+---
+
+### Funciones utiles 
+- `lines`: agrega lineas a un gráfico, dado dos vectores de valores
+- `points`: agrega puntos a un gráfico 
+- `text`: agrega etiquetas de texto a un gráfico, especificando su posición con coordenadas "x" y "y" 
+- `title`: agregar anotaciones a las etiquetas del eje x, y, titulo, subtitulo o fuera del margen
+- `axis`: agrega etiquetas a los ejes
+- `legend`: recibe la ubicación de la legenda como primer parámetro (topleft, topright, bottomleft, bottomright) y el parámetro `legend = "texto"`
+
+---
+
+#### Box plot
+```{r out.width = '400px'}
+boxplot(Ozone ~ Month, airquality, xlab = "Mes", ylab = "Ozono")
+title(main = "Niveles de ozono según el mes del año")
+```
+
+---
+
+Scatter plot
+```{r out.width = '400px'}
+with(airquality, plot(Wind, Ozone, main = "Ozono con respecto al polvo", col = "red"))
+with(subset(airquality, Month == 5), points(Wind, Ozone, col = "blue"))
+legend("topright", pch = 1, col = c("blue", "red"), legend = c("May", "Other Months"))
+```
+
+
+---
+
+#### Gráfico base con regresión lineal 
+```{r out.width = '400px'}
+with(airquality, plot(Wind, Ozone, main = "Ozone y Polvo en Nueva York", pch=20))
+model <- lm(Ozone ~ Wind, airquality)
+abline(model, lwd=2)
+```
+
+
+---
+#### Gráficos múltiples 
+```{r out.width = '400px'}
+par(mfrow = c(1, 2))
+with(airquality, {
+    plot(Wind, Ozone, main = "Ozono y Polvo")
+    plot(Solar.R, Ozone, main = "Ozono y Radiación solar")
+})
+```
+
+---
+
+### Cargar los datos y explorarlos
+
+```{r}
+data("iris")
+```
+
+```{r}
+head(iris)
+```
+
+---
+
+```{r}
+summary(iris)
+```
+
+Características de las variables de iris 
+```{r}
+str(iris)
+```
+
+---
+
+## Sistema ggplot2
+
+### Componentes basicos de un gráfico en ggplto2
+- A **data frame** 
+    - Se específica con `data = <dataset>`
+- **aesthetic mappings**: como los datos son representados en el sentido del color y  el tamaño 
+    - Se especifica con `mapping = aes(x = <variable>)`
+- **geoms**: objetos geometricos como puntos, lineas y figuras
+    - Se específica con el método correspondiente al gráfico 
+- **facets**: transformaciones estadisticas como cuantiles 
+- **scales**: que escala usar (example: hombre = rojo, mujer = azul)
+- **sistema de coordenadas**
+
+---
+
+#### Una variable continua
+```{r message=FALSE}
+ggplot(data = iris, mapping = aes(x = Sepal.Width)) + geom_histogram()
+```
+
+
+---
+
+```{r message=FALSE}
+ggplot(data = iris, mapping = aes(x = Sepal.Width)) + geom_density()
+```
+
+---
+
+```{r message=FALSE}
+ggplot(data = iris, mapping = aes(x = Sepal.Width)) + geom_dotplot()
+```
+
+---
+
+```{r message=FALSE}
+ggplot(data = iris, mapping = aes(x = Sepal.Width)) + geom_freqpoly()
+```
+
+---
+
+```{r message=FALSE}
+ggplot(data = iris, mapping = aes(x = Sepal.Width)) + geom_area(stat = "count")
+```
+
+---
+
+#### Una variable categórica 
+```{r message=FALSE, out.width = '400px'}
+data2 <- iris[iris$Sepal.Length > 5.5, ]
+ggplot(data = data2, mapping = aes(x=Species)) + geom_bar()
+```
+
+---
+
+Hacer un gráfico de barras con dos variables 
+```{r message=FALSE, out.width = '400px'}
+ggplot(data = data2, mapping = aes(x = Species, y = Petal.Width)) + 
+    geom_col(position = "stack")
+```
+
+---
+
+#### Dos varaibles continuas 
+Scatterplot
+```{r message=FALSE, out.width = '400px'}
+ggplot(data = iris, mapping = aes(x = Petal.Length, y = Petal.Width)) + geom_point()
+```
+
+---
+Agrega variación aleatoria a la posición de los puntos
+```{r message=FALSE}
+ggplot(data = iris, mapping = aes(x = Petal.Length, y = Petal.Width)) + geom_jitter()
+```
+
+---
+Gráfico de los cuantiles
+```{r message=FALSE, out.width = '400px'}
+ggplot(data = data2, mapping = aes(x = Petal.Length, y = Petal.Width)) + 
+    geom_quantile(quantiles = c(0.2, 0.4, 0.6, 0.8, 0.9))
+```
+
+---
+Mostrar lineas de regresión de los datos para ayudar a la identificación de patrones
+```{r message=FALSE}
+ggplot(data = data2, mapping = aes(x = Petal.Length, y = Petal.Width)) + geom_smooth()
+```
+
+---
+
+En el caso de querer una regresión lineal 
+```{r message=FALSE}
+ggplot(data = data2, mapping = aes(x = Petal.Length, y = Petal.Width)) + 
+    geom_smooth(method = "lm")
+```
+
+---
+
+Graficar las distribuciones de ambas variables
+```{r message=FALSE}
+ggplot(data = data2, mapping = aes(x = Petal.Length, y = Petal.Width)) + geom_rug()
+```
+
+---
+Combinar capas
+```{r message=FALSE}
+ggplot(data = iris, mapping = aes(x=Petal.Length, y=Petal.Width)) + geom_rug(col = "red") +
+  geom_point(col = "blue") + geom_smooth(method="lm", col = "brown")
+```
+
+---
+
+#### Agregar texto al gráfico
+Usando geom text
+```{r message=FALSE, out.width = '400px'}
+data = data.frame("NumeroAlumnos" =c(2, 3, 4, 6), 
+                  "Calificacion" = runif(4, min = 0, max = 10))
+ggplot(data = data, mapping = aes(x=NumeroAlumnos, y=Calificacion)) + 
+    geom_col() + geom_text(label = c("1", "2", "3", "4"), nudge_y = 0.5)
+```
+
+---
+
+Usando annotate
+```{r message=FALSE}
+ggplot(data = iris, mapping = aes(x=Species, y=Petal.Width)) + geom_boxplot() +
+  annotate(geom="text", x=c(1,2,3), y=c(3,3,3),label=c(0.2,1.3,2))
+```
+
+
+---
+
+### Cargar los datos y explorarlos
+
+```{r}
+data("mpg")
+```
+
+```{r}
+head(mpg)
+```
+
+---
+
+```{r}
+summary(mpg)
+```
+
+---
+
+Características de las variables
+```{r}
+str(mpg)
+```
+
+---
+
+Faceting
+
+```{r}
+ggplot(mpg, aes(x=displ, y=hwy)) + geom_point()
+```
+
+---
+
+Mostrar la relación según el año de fabricación en horizontal 
+
+```{r message=FALSE}
+ggplot(mpg, aes(displ, hwy)) + geom_point() + facet_grid(rows = vars(year))
+```
+
+---
+
+Mostrar la relación según el año de fabricación
+
+```{r message=FALSE}
+ggplot(mpg, aes(displ, hwy)) + geom_point() + facet_grid(cols = vars(year))
+```

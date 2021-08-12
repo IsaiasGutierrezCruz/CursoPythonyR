@@ -1,0 +1,176 @@
+---
+title: "3.Factores_dataframes_funciones"
+author: "Abel Isaias Gutierrez-Cruz"
+date: "5/8/2021"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Factores 
+```{r}
+x <- factor(c("si", "si", "no", "talvez", "si", "no", "talvez"))
+print(x)
+print(table(x))
+```
+```{r}
+unclass(x)
+```
+Modificar el orden de los factores
+```{r}
+x <- factor(c("si", "si", "no", "talvez", "si", "no", "talvez"), levels = c("si", "no", "talvez"))
+print(x)
+```
+
+## Data frames 
+Crear un data frame 
+```{r}
+data <- data.frame(foo = 1:4, bar = c(T, T, F, F))
+data
+```
+
+Ver el numero de columnas y filas de un data frame 
+```{r}
+print(nrow(data))
+print(ncol(data))
+```
+Ver los nombre de columnas y filas 
+```{r}
+names(data)
+# cambiar nomabres de columnas
+names(data) <- c("fecha", "nombre")
+names(data)
+
+row.names(data)
+# cambiar nombres de filas 
+
+row.names(data) <- c("obs1", "obs2", "obs3", "obs4")
+row.names(data)
+```
+Creación de un dataframe vacio
+```{r}
+datavacio <- data.frame("nombre" = character(), "temperatura" = numeric(), "velocidad" = numeric())
+datavacio
+```
+
+Agregar filas: 
+```{r}
+datavacio <- rbind(datavacio, list("Isaias", 27, 20))
+
+x <- data.frame(foo = 1:4, bar = c(T, T, F, F))
+x <- rbind(x, list(5, TRUE))
+
+# si agregas un elemento de difente naturaleza a una columna
+# R va a intentar remediar esto
+x <- rbind(x, list(5, 1))
+```
+
+Agregar columnas: 
+```{r}
+x <- data.frame(foo = 1:4, bar = c(T, T, F, F))
+
+velocidad <- c(23, 56, 4, 12)
+x <- cbind(x, velocidad)
+
+#velocidad <- c(23, 56, 4, 12, 47)
+#cbind(x, velocidad) ##### error 
+```
+### Acceder a elementos 
+Usando `$`
+```{r}
+# usando $
+x$foo
+x$bar
+x$velocidad
+```
+Usando `[]`
+```{r}
+# usando numeros 
+# [numero de fila, numero columna]
+
+# seleccionar la primer fila 
+x[1, ]
+# seleeccionar columnas 
+x[, 2]
+
+print(x[3, 2])
+x[4, 3]
+x[2:3, ]
+x[2:3, 3]
+```
+```{r}
+row.names(x) <- c("obs1", "obs2", "obs3", "obs4")
+row.names(x)
+
+#usando sus nombres 
+x["obs1", ]
+x[, "bar"]
+```
+
+### Eliminar columnas
+```{r}
+x <- x[, -c(2)]
+
+
+x <- data.frame(foo = 1:4, bar = c(T, T, F, F), velocidad = c(45, 12 , 45, 54))
+x <- x[, c("foo", "velocidad")]
+```
+
+### Filtrar datos 
+```{r}
+x[x$foo > 2, ]
+x[x$bar == TRUE, ]
+x[x$velocidad == 45, ]
+```
+
+## Funciones 
+```{r}
+suma <- function(num1, num2){
+    res <- num1 + num2
+    print(res)
+}
+suma(5, 8)
+```
+obtener los parametros de una función determinada
+```{r}
+formals(suma)
+args(suma)
+formals(data.frame)
+```
+Funciones que regresan su resultado
+```{r}
+sumaQueRegresaResultado <- function(num1, num2){
+    res <- num1 + num2
+    return(res)
+}
+resultadoFinal <- sumaQueRegresaResultado(5, 78)
+
+
+sumaQueNoRegresaResultado <- function(num1, num2){
+    res <- num1 + num2
+    res
+}
+resultadoFinal <- sumaQueNoRegresaResultado(78, 6)
+```
+
+```{r}
+multiplicar <- function(num1, num2 = 5){
+    res <- num1*num2
+    res
+}
+multiplicar(10)
+multiplicar(10, 2)
+```
+
+### Funciones anonimas
+```{r}
+Reduce(function(x, y){x + y}, 1:10)
+```
+
+
+
+

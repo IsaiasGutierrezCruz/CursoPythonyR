@@ -1,0 +1,5 @@
+Columna1	Columna2	Articulos
+1 	2	"Lapiz"
+4	5.5	"Mochila"
+7	8	"Teclado"
+7	8	"Teclado"

@@ -1,0 +1,190 @@
+---
+title: "4.DatosNA_leerArchivos_funcionesLoop"
+author: "Abel Isaias Gutierrez-Cruz"
+date: "9/8/2021"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+## Remover valores NA 
+```{r}
+x <- c(1, 2, NA, 4, NA, 5)
+bad <- is.na(x)
+print(bad)
+print(!bad)
+x[!bad]
+```
+### Usando la función `complete.cases`
+```{r}
+x <- c(1, 2, NA, 4, NA, 5)
+y <- c("a", "b", NA, "d", NA, 8)
+good <- complete.cases(x, y)
+print(y[good])
+print(x[good])
+```
+```{r}
+x <- c(1, 2, NA, 4, NA, 5)
+y <- c("a", "b", NA, "d", NA, NA)
+good <- complete.cases(x, y)
+print(x[good])
+print(y[good])
+```
+Eliminar NA de dataframes
+```{r}
+data("airquality")
+good <- complete.cases(airquality)
+datosLimpios <- airquality[good, ]
+```
+
+
+
+## Descargar y leer archivos 
+### Descargar
+```{r}
+url <- "https://d396qusza40orc.cloudfront.net/getdata%2Fdata%2Fss06hid.csv"
+download.file(url, destfile = "../Data/SurveyHousing.csv", mode = "wb")
+```
+
+### Leer archivos csv
+```{r}
+data <- read.csv("../Data/SurveyHousing.csv")
+```
+
+### Leer archivos separados por tabulaciones 
+```{r}
+data <- read.table("../Data/separadoPorTabulaciones.txt", sep = "\t", header = TRUE)
+```
+
+
+### Leer archivos xlsx
+```{r}
+fileUrl2 <- "https://d396qusza40orc.cloudfront.net/getdata%2Fdata%2FDATA.gov_NGAP.xlsx"
+# se tiene que establecer el mode = "wb"
+download.file(fileUrl2, destfile = "../Data/NaturalGasAquisition.xlsx", mode = "wb")
+
+library(xlsx)
+data <- read.xlsx("../Data/NaturalGasAquisition.xlsx", sheetIndex = 1, 
+                            header = TRUE, rowIndex = c(18, 19, 20, 21, 22, 23), 
+                            colIndex = c(7, 8, 9, 10 ,11, 12, 13, 14, 15))
+```
+
+## Funciones para explorar archivos 
+```{r}
+print(head(data, 1))
+tail(data, 1)
+summary(data)
+
+```
+```{r}
+data("airquality")
+airquality
+head(airquality)
+tail(airquality)
+print(summary(airquality))
+str(airquality)
+quantile(airquality, na.rm = TRUE, probs = c(0.2, 0.4, 0.7))
+table(airquality$Ozone)
+```
+
+```{r}
+data <- read.csv("../Data/titanic.csv")
+table(data$Sex, data$Survived)
+table(data$Sex)
+```
+
+## Funciones bucle (loop functions)
+### Lapply
+Obtener el promedio de cada uno de los elementos de la lista
+```{r}
+x <- list(a = 1:5, b = rnorm(10))
+print(x)
+print(lapply(x, mean))
+```
+Forma con la función Lapply
+```{r}
+
+print(x)
+print("")
+print(lapply(x, runif, min = 0, max = 10))
+resultado <- lapply(x, runif, min = 0, max = 10)
+class(resultado)
+```
+Forma manual: 
+```{r}
+runif(1, min = 0, max = 10)
+runif(2, min = 0, max = 10)
+runif(3, min = 0, max = 10)
+runif(4, min = 0, max = 10)
+```
+### Sapply
+```{r}
+# aplicando la función lapply
+
+x <- rep(2, 4) 
+
+resultadoL <- lapply(x, runif, min = 0, max = 10)
+print(class(resultadoL))
+
+resultadoS <- sapply(x, runif, min = 0, max = 10)
+print(class(resultadoS))
+```
+
+### Apply
+Obtener el promedio de cada una de las columnas
+```{r}
+x <- matrix(rnorm(200), 20, 10)
+apply(x, 2, mean)
+```
+Obtener el promedio de cada una de las filas 
+```{r}
+apply(x, 1, mean)
+```
+
+Calcular cuartiles
+```{r}
+x <- matrix(rnorm(200), 20, 10)
+apply(x, 1, quantile, probs = c(0.25, 0.75))
+```
+
+### Mapply
+Generar una lista de numeros, queremos que se repite cuatro veces el número 1, que se repita 3 veces el numero 2, dos veces el número 3 y una vez el número 4
+Forma tediosa de hacerlo: 
+```{r}
+print(list(rep(1, 4), rep(2, 3), rep(3, 2), rep(4, 1)))
+```
+Forma fácil al utilizar la función mapply
+```{r}
+mapply(rep, 1:4, 4:1)
+```
+
+### Tapply
+```{r}
+# Generar 30 elementos númericos
+x <- c(rnorm(10), runif(10), rnorm(10, 1))
+f <- gl(3, 10)
+tapply(x, f, mean)
+```
+
+### Split
+```{r}
+# Generar 30 elementos númericos
+x <- c(rnorm(10), runif(10), rnorm(10, 1))
+f <- gl(3, 10)
+# separación del vector en grupos
+split(x, f)
+lapply(split(x, f), mean)
+```
+##### Aplicación de la función split en un dataframe
+```{r}
+data("airquality")
+# separar dataframe conforme a los valores en la variable "Month"
+s <- split(airquality, airquality$Month)
+lapply(s, function(x) colMeans(x[, c("Ozone", "Solar.R", "Wind")], na.rm = TRUE))
+```
+
